@@ -60,3 +60,15 @@ if __name__ == "__main__":
 
     # FIX (app.py): added 'failed' count to summary so failures are visible.
     print(f"Failed:    {len(manager.get_jobs_by_status('failed'))}")
+
+    # Activity 3: each job keeps its own private log, exposed only via
+    # get_logs(). Printing them here demonstrates encapsulation in action.
+    print("\n=== JOB LOGS ===")
+
+    for job in jobs:
+
+        print(f"Job {job.job_id} ({job.description}):")
+
+        for entry in job.get_logs():
+
+            print(f"  {entry}")
