@@ -36,6 +36,11 @@ def build_jobs():
 
         JobFactory.create_job("priority", job_id=6, description="Routine cleanup task", priority=1),
 
+        JobFactory.create_job(
+            "retryable", job_id=7, description="Flaky external API call",
+            max_retries=3, failure_rate=0.6,
+        ),
+
     ]
 
 

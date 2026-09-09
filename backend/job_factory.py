@@ -6,7 +6,7 @@ Decouples job creation from concrete Job subclasses (Activity 4: Abstraction).
 
 from typing import Any, Dict, Type
 
-from backend.model import DataProcessingJob, EmailJob, Job, PriorityJob
+from backend.model import DataProcessingJob, EmailJob, Job, PriorityJob, RetryableJob
 
 
 class JobFactory:
@@ -21,6 +21,7 @@ class JobFactory:
         "email": EmailJob,
         "data_processing": DataProcessingJob,
         "priority": PriorityJob,
+        "retryable": RetryableJob,
     }
 
     @classmethod
