@@ -4,9 +4,12 @@ Defines the Job hierarchy (parent + child classes).
 Polymorphism: each subclass implements its own execute().
 """
 
+import random
 import time
 from datetime import datetime
 from typing import List, Optional
+
+from backend.errors import JobExecutionError
 
 
 class Job:
@@ -193,3 +196,73 @@ class PriorityJob(Job):
         print(f"Running priority job (priority={self.priority}): {self.description}...")
 
         self._log(f"Ran priority job at priority={self.priority}")
+
+
+
+class RetryableJob(Job):
+
+    """Child class: retries its own (possibly flaky) work internally.
+
+    Demonstrates resilience — a transient failure inside execute() doesn't
+    immediately fail the job; it's retried up to max_retries times with a
+    short backoff before giving up.
+    """
+
+    def __init__(
+        self,
+        job_id: int,
+        description: str,
+        max_retries: int = 3,
+        failure_rate: float = 0.5,
+        backoff_seconds: float = 0.3,
+    ) -> None:
+
+        super().__init__(job_id, description)
+
+        self.max_retries = max_retries
+
+        self.failure_rate = failure_rate
+
+        self.backoff_seconds = backoff_seconds
+
+        self.attempts = 0
+
+
+    def _do_work(self) -> None:
+
+        """Simulates a flaky operation that sometimes fails transiently."""
+
+        if random.random() < self.failure_rate:
+
+            raise JobExecutionError(self.job_id, "Simulated transient failure")
+
+        print(f"Work succeeded for job {self.job_id} ({self.description})")
+
+
+    def execute(self) -> None:
+
+        for attempt in range(1, self.max_retries + 1):
+
+            self.attempts = attempt
+
+            try:
+
+                self._log(f"Attempt {attempt}/{self.max_retries}")
+
+                self._do_work()
+
+                self._log(f"Succeeded on attempt {attempt}")
+
+                return
+
+            except JobExecutionError as e:
+
+                self._log(f"Attempt {attempt} failed: {e}")
+
+                if attempt == self.max_retries:
+
+                    self._log("All retry attempts exhausted")
+
+                    raise
+
+                time.sleep(self.backoff_seconds)
