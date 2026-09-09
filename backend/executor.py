@@ -39,6 +39,11 @@ class Executor:
 
     def run_job(self, job: Job) -> None:
 
+        # Activity 5: start()/end() bracket the whole attempt (including the
+        # simulated delay and any failure) so duration reflects real elapsed
+        # time. finally guarantees end() runs even when the job fails.
+        job.start()
+
         try:
 
             print(f"[{self._ts()}] Executing job {job.job_id} ({job.description})...")
@@ -65,6 +70,12 @@ class Executor:
             self.manager.update_status(job, "failed")
 
             print(f"[{self._ts()}] Error in job {e.job_id}: {e}")
+
+        finally:
+
+            job.end()
+
+            print(f"[{self._ts()}] Job {job.job_id} duration: {job.duration:.2f}s")
 
 
     def run(self) -> None:
