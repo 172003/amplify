@@ -71,7 +71,14 @@ class Executor:
 
         threads: List[threading.Thread] = []
 
-        for job in self.jobs:
+        # Activity 2: start higher-priority jobs first. Jobs without a
+        # 'priority' attribute (EmailJob, DataProcessingJob) default to 0,
+        # so this only affects PriorityJob instances. Since jobs still run
+        # concurrently on separate threads, this controls start order, not
+        # guaranteed completion order.
+        ordered_jobs = sorted(self.jobs, key=lambda j: getattr(j, "priority", 0), reverse=True)
+
+        for job in ordered_jobs:
 
             t = threading.Thread(target=self.run_job, args=(job,))
 
