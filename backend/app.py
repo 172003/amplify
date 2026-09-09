@@ -76,3 +76,6 @@ if __name__ == "__main__":
         for entry in job.get_logs():
 
             print(f"  {entry}")
+
+        # Activity 5: duration is timed by Executor via job.start()/job.end().
+        print(f"  Duration: {job.duration:.2f}s")

@@ -4,8 +4,9 @@ Defines the Job hierarchy (parent + child classes).
 Polymorphism: each subclass implements its own execute().
 """
 
+import time
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 
 class Job:
@@ -25,6 +26,11 @@ class Job:
         self.__status = "pending"
 
         self.__logs: List[str] = []
+
+        # Activity 5: lifecycle timing, set by start()/end().
+        self.__start_time: Optional[float] = None
+
+        self.__end_time: Optional[float] = None
 
         self._log(f"Job created with status '{self.__status}'")
 
@@ -69,6 +75,36 @@ class Job:
         """Public read-only access to this job's internal logs."""
 
         return list(self.__logs)
+
+
+    def start(self) -> None:
+
+        """Marks the beginning of execution. Call once, before doing any work."""
+
+        self.__start_time = time.monotonic()
+
+        self._log("Job started")
+
+
+    def end(self) -> None:
+
+        """Marks the end of execution. Call once, after work finishes (success or failure)."""
+
+        self.__end_time = time.monotonic()
+
+        self._log(f"Job ended (duration: {self.duration:.2f}s)")
+
+
+    @property
+    def duration(self) -> float:
+
+        """Elapsed seconds between start() and end(). 0.0 if either hasn't been called."""
+
+        if self.__start_time is None or self.__end_time is None:
+
+            return 0.0
+
+        return self.__end_time - self.__start_time
 
 
     def execute(self) -> None:
