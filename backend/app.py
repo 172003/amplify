@@ -11,7 +11,7 @@ if __package__ in (None, ""):
     if project_root not in sys.path:
         sys.path.insert(0, project_root)
 
-from backend.model import DataProcessingJob, EmailJob
+from backend.model import DataProcessingJob, EmailJob, PriorityJob
 from backend.task_manager import TaskManager
 from backend.executor import Executor
 
@@ -27,6 +27,10 @@ def build_jobs():
         EmailJob(3, "admin@example.com"),
 
         DataProcessingJob(4, "dataset_B"),
+
+        PriorityJob(5, "Critical system alert", priority=10),
+
+        PriorityJob(6, "Routine cleanup task", priority=1),
 
     ]
 
