@@ -11,26 +11,30 @@ if __package__ in (None, ""):
     if project_root not in sys.path:
         sys.path.insert(0, project_root)
 
-from backend.model import DataProcessingJob, EmailJob, PriorityJob
+from backend.job_factory import JobFactory
 from backend.task_manager import TaskManager
 from backend.executor import Executor
 
 
 def build_jobs():
 
+    # Activity 4: app.py never imports EmailJob/DataProcessingJob/PriorityJob
+    # directly — it only knows type names and parameters, as if these came
+    # from an API request or a config file. JobFactory hides the concrete
+    # classes.
     return [
 
-        EmailJob(1, "user@example.com"),
+        JobFactory.create_job("email", job_id=1, recipient="user@example.com"),
 
-        DataProcessingJob(2, "dataset_A"),
+        JobFactory.create_job("data_processing", job_id=2, dataset="dataset_A"),
 
-        EmailJob(3, "admin@example.com"),
+        JobFactory.create_job("email", job_id=3, recipient="admin@example.com"),
 
-        DataProcessingJob(4, "dataset_B"),
+        JobFactory.create_job("data_processing", job_id=4, dataset="dataset_B"),
 
-        PriorityJob(5, "Critical system alert", priority=10),
+        JobFactory.create_job("priority", job_id=5, description="Critical system alert", priority=10),
 
-        PriorityJob(6, "Routine cleanup task", priority=1),
+        JobFactory.create_job("priority", job_id=6, description="Routine cleanup task", priority=1),
 
     ]
 
